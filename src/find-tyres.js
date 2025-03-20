@@ -1,4 +1,4 @@
-console.log("Loaded find-tyres.js");
+console.log("find-tyre.js");
 
 $(document).ready(function () {
     let tyres = [];
@@ -111,4 +111,36 @@ $(document).ready(function () {
             }
         }, 300);
     }
+
+    // Find Tyres by Vehicle
+
+    $("#by-vehicle, #by-size").click(function () {
+        var isVehicle = $(this).is("#by-vehicle");
+        $("#by-vehicle, #by-size").removeClass("active");
+        $(this).addClass("active");
+        $(".by-vehicle, .by-size").addClass("hide");
+        $(isVehicle ? ".by-vehicle" : ".by-size").removeClass("hide");
+    });
+
+    // set the following select fields to disabled
+    $('#find-model,#find-year,#find-trim,#find-size').prop('disabled', true);
+
+    // set vehicle makes to dropdown list
+    $("#vehicle-make-list .w-dyn-item").each(function () {
+        var make = $(this).find(".vehicle-make-name").text();
+        var slug = $(this).find(".vehicle-make-slug").text();
+        $("#find-make").append(new Option(make, slug));
+    });
+
+    // // if #find-make changes, remove disabled from #find-year
+    // $("#find-make").change(function () {
+    //     $("#find-year").prop('disabled', false);
+    // });
+
+    // // set #find-year options from the year 2000 to the current year
+    // var currentYear = new Date().getFullYear();
+    // for (var i = currentYear; i >= 2000; i--) {
+    //     $("#find-year").append(new Option(i, i));
+    // }
+
 }); // End of document.ready

@@ -1,4 +1,4 @@
-console.log("Loaded cookies.js");
+console.log("cookies.js");
 
 const cookieBanner = document.getElementById("cookie-banner");
 const customiseBtn = document.getElementById("customise-cookies");
