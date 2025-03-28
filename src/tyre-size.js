@@ -2,6 +2,8 @@ console.log("tyre-size.js");
 
 if (window.location.pathname.includes('/tyre-size/')) {
 
+    let allMsfidsAdded = false;
+
     // PAGE LAYOUT
 
     // Set star ratings
@@ -25,7 +27,7 @@ if (window.location.pathname.includes('/tyre-size/')) {
 
     // Count tyres and update #quote-all-button on page load
     const defaultText = 'Quote ' + $('.result-item').length + ' Tyres';
-    $('#quote-all-button').text(defaultText);
+    updateQuoteButtonText(defaultText);
 
     // Store selected tyres in an array for quoting purposes
     var msfidArray = [];
@@ -50,6 +52,10 @@ if (window.location.pathname.includes('/tyre-size/')) {
 
     // data-msfid click without .added-to-quote, add to msfidArray
     $('[data-msfid]').on('click', function () {
+        if (allMsfidsAdded === true) {
+            msfidArray = [];
+            allMsfidsAdded = false;
+        }
         if (!$(this).hasClass('added-to-quote')) {
             msfidArray.push($(this).data('msfid'));
             $(this).parents('.w-dyn-item').children('.result-overlay').animate({opacity: 1}, 200);
@@ -140,11 +146,15 @@ if (window.location.pathname.includes('/tyre-size/')) {
     // if #quote-all-button is clicked and msfidArray is empty, then load all data-msfid values into msfidArray
     $('#quote-all-button').on('click', function () {
         if (msfidArray.length === 0) {
+            // Add all msfids to array
             $('[data-msfid]').each(function () {
                 msfidArray.push($(this).data('msfid'));
             });
+            console.log('msfidArray: ' + msfidArray);
+            // set a veriable that all msfids are added to the array
+            allMsfidsAdded = true;
+            console.log('allMsfidsAdded: ' + allMsfidsAdded);
         }
-        console.log('msfidArray: ' + msfidArray);
     });
-    // if
+    
 }
