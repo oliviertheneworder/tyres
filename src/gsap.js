@@ -1,6 +1,14 @@
 console.log('gsap.js');
 
+// Import GSAP and ScrollTrigger from the installed package
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register the ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
+
+// Make GSAP available globally
+window.gsap = gsap;
 
 // Logo Ticker
 const ticker = document.querySelector("#ticker");

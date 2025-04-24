@@ -10,6 +10,7 @@ async function build() {
         outfile: './dist/index.js', // Output file
         minify: true, // Optional: Minify for production
         sourcemap: true, // Optional: Generate sourcemaps
+        treeShaking: true // Optional: Remove unused code
     });
 
     if (isWatch) {

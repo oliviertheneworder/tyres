@@ -1,4 +1,4 @@
-console.log('main.js');
+console.log('main.js from local');
 
 // Import modules
 // import './cookies.js';

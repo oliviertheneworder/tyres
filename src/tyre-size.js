@@ -112,6 +112,7 @@ if (window.location.pathname.includes('/tyre-size/')) {
 
     // Disable branch dropdown initially
     const branchSelect = $('#quote-branch');
+    const branchSelectId = $('#quote-branch-id');
     branchSelect.prop('disabled', true);
 
     // When province is selected, populate branch dropdown
@@ -126,10 +127,11 @@ if (window.location.pathname.includes('/tyre-size/')) {
             branchItems.each(function () {
                 const branchProvince = $(this).find('.branch-province').text();
                 const branchName = $(this).find('.branch-name').text();
+                const branchId = $(this).find('.branch-id').text();
 
                 if (branchProvince === selectedProvince) {
                     branchSelect.append($('<option>', {
-                        value: branchName,
+                        value: branchId,
                         text: branchName
                     }));
                 }
@@ -141,6 +143,12 @@ if (window.location.pathname.includes('/tyre-size/')) {
             // If no province is selected, disable branch dropdown
             branchSelect.prop('disabled', true);
         }
+    });
+
+    // When branch is selected, update branchSelectId value
+    branchSelect.on('change', function() {
+        const selectedBranchId = $(this).val();
+        branchSelectId.val(selectedBranchId);
     });
 
     // if #quote-all-button is clicked and msfidArray is empty, then load all data-msfid values into msfidArray

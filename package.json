@@ -12,5 +12,8 @@
   "description": "",
   "devDependencies": {
     "esbuild": "^0.25.1"
+  },
+  "dependencies": {
+    "gsap": "^3.12.2"
   }
 }
