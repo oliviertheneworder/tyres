@@ -11,7 +11,6 @@ const SELECTORS = {
     QUOTE_MSFID_INPUT: 'input[name="quote_msfid"]',
     QUOTE_TYRE_DATA: 'input[name="quote_tyre_data"]',
     QUOTE_RAW_SEARCH: 'input[name="quote_raw_search"]',
-    QUOTE_EXT_REF: 'input[name="quote_ext_ref"]',
     QUOTE_PROVINCE: 'select[name="quote_province"]',
     QUOTE_BRANCH: 'select[name="quote_branch"]',
     QUOTE_BRANCH_ID: 'input[name="quote_branch_id"]',
@@ -90,10 +89,6 @@ if (window.location.pathname.includes('/tyre-size/')) {
             $(SELECTORS.QUOTE_RAW_SEARCH).val(`${width}${aspectRatio}${diameter}`);
         }
     }
-
-    // Set reference ID
-    const referenceId = `TNO-${generateTimestamp()}`;
-    $(SELECTORS.QUOTE_EXT_REF).val(referenceId);
 
     // Initialize quote button text
     updateQuoteButtonText(defaultText);
