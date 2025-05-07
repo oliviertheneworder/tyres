@@ -4,7 +4,7 @@ $(document).ready(function () {
     let tyres = [];
 
     // Disable profile, rim, and submit button initially
-    $("#find-profile, #find-rim, #find-tyres-form button[type='submit']").prop("disabled", true);
+    $('select[name="profile"], select[name="rim"], #find-tyres-form button[type="submit"]').prop("disabled", true);
 
     // Extract CMS data
     $("#size-data .w-dyn-item").each(function () {
@@ -20,10 +20,10 @@ $(document).ready(function () {
     // Get unique values
     let uniqueRatios = [...new Set(tyres.map(t => t.ratio))].sort((a, b) => a - b);
 
-    let $ratioSelect = $("#find-ratio"),
-        $profileSelect = $("#find-profile"),
-        $rimSelect = $("#find-rim"),
-        $submitButton = $("#find-tyres-form button[type='submit']");
+    let $ratioSelect = $('select[name="ratio"]'),
+        $profileSelect = $('select[name="profile"]'),
+        $rimSelect = $('select[name="rim"]'),
+        $submitButton = $('#find-tyres-form button[type="submit"]');
 
     // Populate Ratio dropdown
     uniqueRatios.forEach(ratio => {
@@ -76,42 +76,6 @@ $(document).ready(function () {
         localStorage.setItem("selectedTyreRim", $(this).val());
     });
 
-    // Form Submission (Redirect to results page)
-    $("#find-tyres-form").on("submit", function (event) {
-        event.preventDefault();
-
-        let ratio = $ratioSelect.val();
-        let profile = $profileSelect.val().replace(".", "-");
-        let rim = $rimSelect.val().toLowerCase();
-
-        if (ratio && profile && rim) {
-            localStorage.setItem("selectedTyreSize", `${ratio}-${profile}-${rim}`);
-            window.location.href = `/tyre-size/${ratio}-${profile}-${rim}`;
-        } else {
-            alert("Please select all fields.");
-        }
-    });
-
-    // Load saved selections from localStorage (in sequence)
-    let savedRatio = localStorage.getItem("selectedTyreRatio");
-    if (savedRatio) {
-        $ratioSelect.val(savedRatio).trigger("change");
-
-        setTimeout(() => {
-            let savedProfile = localStorage.getItem("selectedTyreProfile");
-            if (savedProfile) {
-                $profileSelect.val(savedProfile).trigger("change");
-
-                setTimeout(() => {
-                    let savedRim = localStorage.getItem("selectedTyreRim");
-                    if (savedRim) {
-                        $rimSelect.val(savedRim).trigger("change");
-                    }
-                }, 300);
-            }
-        }, 300);
-    }
-
     // Find Tyres by Vehicle
 
     $("#by-vehicle, #by-size").click(function () {
@@ -123,13 +87,13 @@ $(document).ready(function () {
     });
 
     // set the following select fields to disabled
-    $('#find-model,#find-year,#find-trim,#find-size').prop('disabled', true);
+    $('select[name="model"], select[name="year"], select[name="trim"], select[name="size"]').prop('disabled', true);
 
     // set vehicle makes to dropdown list
     $("#vehicle-make-list .w-dyn-item").each(function () {
         var make = $(this).find(".vehicle-make-name").text();
         var slug = $(this).find(".vehicle-make-slug").text();
-        $("#find-make").append(new Option(make, slug));
+        $('select[name="make"]').append(new Option(make, slug));
     });
 
     // // if #find-make changes, remove disabled from #find-year

@@ -1,168 +1,210 @@
 console.log("tyre-size.js");
 
+// Constants
+const ICONS = {
+    PLUS: $('[data-msfid]').find('svg path').attr('d'),
+    MINUS: 'M191.87-434.5v-91h576.26v91H191.87Z'
+};
+
+const SELECTORS = {
+    QUOTE_BUTTON: '#quote-all-button',
+    QUOTE_MSFID_INPUT: 'input[name="quote_msfid"]',
+    QUOTE_TYRE_DATA: 'input[name="quote_tyre_data"]',
+    QUOTE_RAW_SEARCH: 'input[name="quote_raw_search"]',
+    QUOTE_EXT_REF: 'input[name="quote_ext_ref"]',
+    QUOTE_PROVINCE: 'select[name="quote_province"]',
+    QUOTE_BRANCH: 'select[name="quote_branch"]',
+    QUOTE_BRANCH_ID: 'input[name="quote_branch_id"]',
+    RESULT_ITEM: '.result-item',
+    BRANCH_ITEM: '.branch-item'
+};
+
+// Utility Functions
+const generateTimestamp = () => {
+    const now = new Date();
+    const pad = (num) => String(num).padStart(2, '0');
+    
+    return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+};
+
+const updateQuoteButtonText = (text) => {
+    const $button = $(SELECTORS.QUOTE_BUTTON);
+    $button.text(text);
+    gsap.timeline()
+        .to($button, { scale: 1.2, duration: 0.15 })
+        .to($button, { scale: 1, duration: 0.15 });
+};
+
+const getTyreDetails = ($element) => {
+    try {
+        const msfid = $element.data('msfid');
+        if (!msfid) throw new Error('MSFID not found');
+        
+        const promos = [];
+        $element.closest(SELECTORS.RESULT_ITEM).find('.promo-item').each(function() {
+            const $promo = $(this);
+            const promoText = $promo.find('.promo-item-txt').text().trim();
+            const promoValue = $promo.find('.promo-item-val').text().trim();
+            
+            promos.push({
+                text: promoText,
+                value: promoValue === 'true' ? true : promoValue === 'false' ? false : promoValue
+            });
+        });
+
+        return { msfid, promos };
+    } catch (error) {
+        console.error('Error getting tyre details:', error);
+        return null;
+    }
+};
+
+// Main initialization
 if (window.location.pathname.includes('/tyre-size/')) {
-
     let allMsfidsAdded = false;
+    let msfidArray = [];
+    const defaultText = `Quote ${$(SELECTORS.RESULT_ITEM).length} Tyres`;
 
-    // PAGE LAYOUT
-
-    // Set star ratings
-    $('.stars').each(function () {
-        var starsContainer = $(this);
-        var starCountElement = starsContainer.find('.star-count');
-        var count = parseInt(starCountElement.text(), 10);
-        count = count - 1;
-        if (!isNaN(count)) {
-            var referenceStar = starsContainer.find('.star').first();
-
-            if (referenceStar.length) {
-                for (var i = 0; i < count; i++) {
-                    starsContainer.append(referenceStar.clone());
+    // Initialize star ratings
+    $('.stars').each(function() {
+        const $starsContainer = $(this);
+        const $starCountElement = $starsContainer.find('.star-count');
+        const count = parseInt($starCountElement.text(), 10) - 1;
+        
+        if (!isNaN(count) && count > 0) {
+            const $referenceStar = $starsContainer.find('.star').first();
+            if ($referenceStar.length) {
+                for (let i = 0; i < count; i++) {
+                    $starsContainer.append($referenceStar.clone());
                 }
             }
         }
     });
 
-    // QUOTE FUNCTIONALITY
-
-    // Count tyres and update #quote-all-button on page load
-    const defaultText = 'Quote ' + $('.result-item').length + ' Tyres';
-    updateQuoteButtonText(defaultText);
-
-    // Store selected tyres in an array for quoting purposes
-    var msfidArray = [];
-
-    const iconPlus = $('[data-msfid]').find('svg path').attr('d'); // plus icon
-    const iconMinus = 'M191.87-434.5v-91h576.26v91H191.87Z'; // minus icon
-
-    // Function to animate quote button text update
-    function updateQuoteButtonText(text) {
-        const $button = $('#quote-all-button');
-        $button.text(text);
-        gsap.timeline()
-            .to($button, {
-                scale: 1.2,
-                duration: 0.15
-            })
-            .to($button, {
-                scale: 1,
-                duration: 0.15
-            });
+    // Convert tyre size from h1 to input format
+    const $h1TyreSize = $('h1').text().trim();
+    if ($h1TyreSize) {
+        const tyreSizeMatch = $h1TyreSize.match(/(\d+)\/(\d+)R(\d+)/);
+        if (tyreSizeMatch) {
+            const [, width, aspectRatio, diameter] = tyreSizeMatch;
+            $(SELECTORS.QUOTE_RAW_SEARCH).val(`${width}${aspectRatio}${diameter}`);
+        }
     }
 
-    // data-msfid click without .added-to-quote, add to msfidArray
-    $('[data-msfid]').on('click', function () {
-        if (allMsfidsAdded === true) {
+    // Set reference ID
+    const referenceId = `TNO-${generateTimestamp()}`;
+    $(SELECTORS.QUOTE_EXT_REF).val(referenceId);
+
+    // Initialize quote button text
+    updateQuoteButtonText(defaultText);
+
+    // Handle tyre selection
+    $('[data-msfid]').on('click', function() {
+        const $this = $(this);
+        
+        if (allMsfidsAdded) {
             msfidArray = [];
             allMsfidsAdded = false;
         }
-        if (!$(this).hasClass('added-to-quote')) {
-            msfidArray.push($(this).data('msfid'));
-            $(this).parents('.w-dyn-item').children('.result-overlay').animate({opacity: 1}, 200);
-            $(this).find('svg path').attr('d', iconMinus);
-            $(this).find('.button-text').text('Remove');
-            $(this).css('background-color', 'transparent');
-            $(this).addClass('added-to-quote');
-            $(this).css('border', '1px solid var(--white)');
-            console.log('msfidArray: ' + msfidArray);
+
+        if (!$this.hasClass('added-to-quote')) {
+            const tyreDetails = getTyreDetails($this);
+            if (tyreDetails) {
+                msfidArray.push(tyreDetails);
+                $this.parents('.w-dyn-item').children('.result-overlay').animate({ opacity: 1 }, 200);
+                $this.find('svg path').attr('d', ICONS.MINUS)
+                    .end()
+                    .find('.button-text').text('Remove')
+                    .end()
+                    .css({
+                        'background-color': 'transparent',
+                        'border': '1px solid var(--white)'
+                    })
+                    .addClass('added-to-quote');
+            }
         } else {
-            // remove from msfidArray
-            msfidArray = msfidArray.filter(id => id !== $(this).data('msfid'));
-            $(this).parents('.w-dyn-item').children('.result-overlay').animate({opacity: 0}, 200);
-            $(this).find('svg path').attr('d', iconPlus);
-            $(this).removeClass('added-to-quote');
-            $(this).find('.button-text').text('Quote');
-            $(this).css('background-color', 'var(--red)');
-            $(this).css('border', 'none');
-            console.log('msfidArray: ' + msfidArray);
+            const msfid = $this.data('msfid');
+            msfidArray = msfidArray.filter(item => item.msfid !== msfid);
+            $this.parents('.w-dyn-item').children('.result-overlay').animate({ opacity: 0 }, 200);
+            $this.find('svg path').attr('d', ICONS.PLUS)
+                .end()
+                .removeClass('added-to-quote')
+                .find('.button-text').text('Quote')
+                .end()
+                .css({
+                    'background-color': 'var(--red)',
+                    'border': 'none'
+                });
         }
 
-        // Update quote button text based on msfidArray length
-        if (msfidArray.length > 0) {
-            updateQuoteButtonText('Quote ' + msfidArray.length + ' Tyres');
-        } else {
-            updateQuoteButtonText(defaultText);
-        }
+        // Update quote_msfid input with full array of objects
+        $(SELECTORS.QUOTE_MSFID_INPUT).val(JSON.stringify(msfidArray));
+        
+        // Update quote button text
+        updateQuoteButtonText(msfidArray.length > 0 ? `Quote ${msfidArray.length} Tyres` : defaultText);
     });
 
-    // QUOTE BRANCH FUNCTIONALITY
+    // Branch functionality
+    const $branchItems = $(SELECTORS.BRANCH_ITEM);
+    const $provinceSelect = $(SELECTORS.QUOTE_PROVINCE);
+    const $branchSelect = $(SELECTORS.QUOTE_BRANCH);
+    const $branchSelectId = $(SELECTORS.QUOTE_BRANCH_ID);
 
-    const branchItems = $('.branch-item');
+    // Initialize provinces
+    const provinces = [...new Set($branchItems.map(function() {
+        return $(this).find('.branch-province').text();
+    }).get())].sort();
 
-    // Extract unique provinces
-    const provinces = [];
-    branchItems.each(function () {
-        const province = $(this).find('.branch-province').text();
-        if (!provinces.includes(province)) {
-            provinces.push(province);
-        }
+    provinces.forEach(province => {
+        $provinceSelect.append($('<option>', { value: province, text: province }));
     });
 
-    // Sort provinces alphabetically
-    provinces.sort();
+    $branchSelect.prop('disabled', true);
 
-    // Populate province dropdown
-    const provinceSelect = $('#quote-province');
-    provinces.forEach(function (province) {
-        provinceSelect.append($('<option>', {
-            value: province,
-            text: province
-        }));
-    });
-
-    // Disable branch dropdown initially
-    const branchSelect = $('#quote-branch');
-    const branchSelectId = $('#quote-branch-id');
-    branchSelect.prop('disabled', true);
-
-    // When province is selected, populate branch dropdown
-    provinceSelect.on('change', function () {
+    // Handle province selection
+    $provinceSelect.on('change', function() {
         const selectedProvince = $(this).val();
-
-        // Clear previous options except the placeholder
-        branchSelect.find('option:not(:first)').remove();
+        $branchSelect.find('option:not(:first)').remove();
 
         if (selectedProvince) {
-            // Find branches for selected province
-            branchItems.each(function () {
-                const branchProvince = $(this).find('.branch-province').text();
-                const branchName = $(this).find('.branch-name').text();
-                const branchId = $(this).find('.branch-id').text();
-
+            $branchItems.each(function() {
+                const $item = $(this);
+                const branchProvince = $item.find('.branch-province').text();
+                
                 if (branchProvince === selectedProvince) {
-                    branchSelect.append($('<option>', {
+                    const branchName = $item.find('.branch-name').text();
+                    const branchId = $item.find('.branch-id').text();
+                    
+                    $branchSelect.append($('<option>', {
                         value: branchId,
                         text: branchName
                     }));
                 }
             });
-
-            // Enable branch dropdown
-            branchSelect.prop('disabled', false);
+            $branchSelect.prop('disabled', false);
         } else {
-            // If no province is selected, disable branch dropdown
-            branchSelect.prop('disabled', true);
+            $branchSelect.prop('disabled', true);
         }
     });
 
-    // When branch is selected, update branchSelectId value
-    branchSelect.on('change', function() {
+    // Handle branch selection
+    $branchSelect.on('change', function() {
         const selectedBranchId = $(this).val();
-        branchSelectId.val(selectedBranchId);
+        $branchSelectId.val(selectedBranchId);
     });
 
-    // if #quote-all-button is clicked and msfidArray is empty, then load all data-msfid values into msfidArray
-    $('#quote-all-button').on('click', function () {
+    // Handle quote all button
+    $(SELECTORS.QUOTE_BUTTON).on('click', function() {
         if (msfidArray.length === 0) {
-            // Add all msfids to array
-            $('[data-msfid]').each(function () {
-                msfidArray.push($(this).data('msfid'));
+            $('[data-msfid]').each(function() {
+                const tyreDetails = getTyreDetails($(this));
+                if (tyreDetails) {
+                    msfidArray.push(tyreDetails);
+                }
             });
-            console.log('msfidArray: ' + msfidArray);
-            // set a veriable that all msfids are added to the array
+            
             allMsfidsAdded = true;
-            console.log('allMsfidsAdded: ' + allMsfidsAdded);
+            $(SELECTORS.QUOTE_MSFID_INPUT).val(JSON.stringify(msfidArray));
         }
     });
-    
 }
