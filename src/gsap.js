@@ -43,6 +43,17 @@ $(".modal-trigger").on("click", function () {
     var $modal = $(this).next(".modal");
     var $modalContent = $modal.find(".modal-content");
     if ($modal.length) {
+        // Move modal to body to prevent nesting issues
+        if ($modal.parent().is('body') === false) {
+            // Store original parent for restoration later
+            $modal.data('original-parent', $modal.parent());
+            $modal.appendTo('body');
+            
+            // Ensure proper z-index stacking
+            var currentZIndex = parseInt($modal.css('z-index')) || 1000;
+            $modal.css('z-index', currentZIndex + 1000);
+        }
+        
         $modal.css("display", "flex"); // Set display to block before animation
         gsap.to($modal, {
             autoAlpha: 1,
@@ -68,6 +79,13 @@ $(".modal-close, .modal-bg").on("click", function () {
             ease: "power2.out",
             onComplete: function () {
                 $modal.css("display", "none"); // Hide after animation
+                // Move modal back to its original position if it was moved to body
+                var originalParent = $modal.data('original-parent');
+                if (originalParent) {
+                    $modal.appendTo(originalParent);
+                    // Restore original z-index
+                    $modal.css('z-index', '');
+                }
             }
         });
         gsap.to($modalContent, {
