@@ -18,17 +18,24 @@ npm run build
 ## 📦 Deployment Strategy
 
 ### For JDeliver (Recommended)
-Use the **`latest`** tag for consistent URLs:
+Use JSDelivr CDN for the best performance and reliability:
 
 ```
-https://github.com/oliviertheneworder/tyres/releases/latest/download/index.js
+https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@latest/dist/index.js
 ```
 
 ### For Version-Specific Releases
-Use version tags for specific releases:
+Use specific version tags:
 
 ```
-https://github.com/oliviertheneworder/tyres/releases/download/v1.1.4/index.js
+https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@v1.1.6/dist/index.js
+```
+
+### For Minified Version
+JSDelivr automatically provides minified versions:
+
+```
+https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@latest/dist/index.min.js
 ```
 
 ## 🔄 Incremental Updates Workflow
@@ -39,11 +46,10 @@ https://github.com/oliviertheneworder/tyres/releases/download/v1.1.4/index.js
    npm version patch  # or minor/major
    git push origin main --tags
    ```
-3. **GitHub Actions automatically**:
-   - Builds the project
-   - Creates a GitHub Release
-   - Updates the `latest` tag
-   - Makes files available for download
+3. **JSDelivr automatically**:
+   - Caches the new version
+   - Makes it available via CDN
+   - Updates the `latest` tag reference
 
 ## 🏗️ Build Process
 
@@ -71,20 +77,31 @@ src/
 ## 🔧 Configuration
 
 ### JDeliver Setup
-Configure JDeliver to use the `latest` tag URL for automatic updates:
+Configure JDeliver to use the JSDelivr CDN URL:
 
 ```
-https://github.com/oliviertheneworder/tyres/releases/latest/download/index.js
+https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@latest/dist/index.js
 ```
 
 This ensures:
 - ✅ URL never changes
 - ✅ Automatic updates when new versions are released
-- ✅ Easy rollback by changing the tag reference
+- ✅ Global CDN for faster loading
+- ✅ Automatic minification available
+- ✅ Better caching and reliability
+
+### JSDelivr Benefits
+- **Global CDN** - Faster loading worldwide
+- **Automatic minification** - Add `.min` to any JS/CSS file
+- **Version ranges** - Use `@3.6` instead of `@3.6.4`
+- **Latest version** - Use `@latest` for automatic updates
+- **Reliable caching** - Better than GitHub Releases
 
 ## 📋 Version History
 
-- **v1.1.4** - Modal nesting fix, improved z-index management
+- **v1.1.6** - Modal nesting fix, improved z-index management
+- **v1.1.5** - Previous version
+- **v1.1.4** - Previous version
 - **v1.1.3** - Previous version
 - **v1.1.2** - Previous version
 - **v1.1.1** - Previous version
@@ -96,7 +113,7 @@ This ensures:
 2. Test with `npm run watch`
 3. Build with `npm run build`
 4. Commit and tag a new version
-5. Push to trigger automatic release
+5. Push to trigger automatic CDN update
 
 ## 📄 License
 

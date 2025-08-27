@@ -65,7 +65,8 @@ git push origin latest
 
 echo -e "${GREEN}🎉 Deployment complete!${NC}"
 echo -e "${GREEN}📦 Version: $NEW_VERSION${NC}"
-echo -e "${GREEN}🔗 Latest URL: https://github.com/oliviertheneworder/tyres/releases/latest/download/index.js${NC}"
-echo -e "${GREEN}🏷️  Version URL: https://github.com/oliviertheneworder/tyres/releases/download/v$NEW_VERSION/index.js${NC}"
+echo -e "${GREEN}🔗 Latest URL: https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@latest/dist/index.js${NC}"
+echo -e "${GREEN}🏷️  Version URL: https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@v$NEW_VERSION/dist/index.js${NC}"
+echo -e "${GREEN}📦 Minified URL: https://cdn.jsdelivr.net/gh/oliviertheneworder/tyres@latest/dist/index.min.js${NC}"
 
-echo -e "${BLUE}⏳ GitHub Actions will automatically create the release...${NC}"
+echo -e "${BLUE}⏳ JSDelivr will automatically cache the new version...${NC}"
