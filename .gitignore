@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build outputs
-# dist/  # Temporarily allow dist for initial release
+dist/
 build/
 
 # Environment variables
